@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Card Football Duel</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; background: #0f172a; color: #e2e8f0; }
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
+    .board { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .panel { background:#1e293b; border-radius: 12px; padding: 12px; }
+    .pitch { height: 200px; border:2px solid #334155; border-radius:12px; position:relative; overflow:hidden; }
+    .ball { width:18px; height:18px; border-radius:50%; background:#f8fafc; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); }
+    .cards { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    button.card { background:#334155; color:#f8fafc; border:none; border-radius:8px; padding:8px; cursor:pointer; min-width:120px; }
+    button.card:disabled { opacity:.4; cursor:not-allowed; }
+    .log { height: 280px; overflow:auto; background:#0b1220; border-radius:8px; padding:8px; font-size:14px; }
+    .score { font-size: 28px; font-weight: 800; }
+    .meta { display:flex; justify-content:space-between; align-items:center; margin:8px 0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>カードサッカー：エボリューション11（試作）</h1>
+    <p>シャドバ風のカードを切りながら、ウイイレ風にボール支配とゴールを競うミニゲーム。</p>
+    <div class="meta">
+      <div class="score"><span id="myScore">0</span> - <span id="cpuScore">0</span></div>
+      <div>残り時間: <span id="time">12</span> ターン</div>
+      <div>EP: <span id="ep">3</span>/5</div>
+    </div>
+
+    <div class="board">
+      <div class="panel">
+        <h3>ピッチ</h3>
+        <div class="pitch" id="pitch"><div class="ball" id="ball"></div></div>
+        <p>ポジション: <b id="zone">センター</b> / ボール保持: <b id="owner">あなた</b></p>
+      </div>
+      <div class="panel">
+        <h3>ログ</h3>
+        <div class="log" id="log"></div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:12px;">
+      <h3>手札（カードを1枚選択）</h3>
+      <div class="cards" id="hand"></div>
+    </div>
+  </div>
+
+<script>
+const ALL_CARDS = [
+  { name:'スルーパス', cost:1, atk:2, desc:'攻撃+2' },
+  { name:'ミドルシュート', cost:2, atk:3, desc:'攻撃+3' },
+  { name:'ワンツー', cost:1, atk:1, ctrl:2, desc:'攻撃+1 支配+2' },
+  { name:'ハイプレス', cost:1, def:2, desc:'守備+2' },
+  { name:'スライディング', cost:1, def:1, ctrl:1, desc:'守備+1 支配+1' },
+  { name:'鉄壁ブロック', cost:2, def:3, desc:'守備+3' },
+  { name:'カウンター', cost:2, atk:2, def:1, desc:'攻撃+2 守備+1' },
+  { name:'ポゼッション', cost:1, ctrl:3, desc:'支配+3' },
+];
+
+let myScore=0, cpuScore=0, ep=3, maxEP=5, turns=12;
+let ballPos=0; // -2..2
+let owner='you';
+let hand=[];
+
+const el = id => document.getElementById(id);
+const log = msg => { el('log').innerHTML = `[T${13-turns}] ${msg}<br>` + el('log').innerHTML; };
+
+function drawHand(){
+  hand = Array.from({length:4},()=>ALL_CARDS[Math.floor(Math.random()*ALL_CARDS.length)]);
+  const h = el('hand'); h.innerHTML='';
+  hand.forEach((c,i)=>{
+    const b=document.createElement('button');
+    b.className='card';
+    b.disabled = c.cost>ep || turns<=0;
+    b.innerHTML=`<b>${c.name}</b><br>EP:${c.cost} / ${c.desc}`;
+    b.onclick=()=>playTurn(i);
+    h.appendChild(b);
+  });
+}
+
+function cpuCard(){ return ALL_CARDS[Math.floor(Math.random()*ALL_CARDS.length)]; }
+
+function playTurn(i){
+  if(turns<=0) return;
+  const my = hand[i];
+  if(my.cost>ep) return;
+  ep -= my.cost;
+  const cpu = cpuCard();
+
+  const myAtk=(my.atk||0)+(owner==='you'?1:0);
+  const myDef=(my.def||0)+(owner==='cpu'?1:0);
+  const myCtrl=(my.ctrl||0);
+  const cpuAtk=(cpu.atk||0)+(owner==='cpu'?1:0);
+  const cpuDef=(cpu.def||0)+(owner==='you'?1:0);
+  const cpuCtrl=(cpu.ctrl||0);
+
+  const myPower = myAtk + myCtrl - cpuDef;
+  const cpuPower = cpuAtk + cpuCtrl - myDef;
+
+  if(myPower>cpuPower){
+    owner='you'; ballPos = Math.min(2, ballPos+1);
+    log(`あなた: ${my.name} / CPU: ${cpu.name} → ラインを押し上げた`);
+  } else if(cpuPower>myPower){
+    owner='cpu'; ballPos = Math.max(-2, ballPos-1);
+    log(`あなた: ${my.name} / CPU: ${cpu.name} → 押し込まれた`);
+  } else {
+    log(`あなた: ${my.name} / CPU: ${cpu.name} → 競り合い`);
+  }
+
+  if(ballPos===2 && owner==='you'){ myScore++; resetKickoff('あなたのゴール！'); }
+  if(ballPos===-2 && owner==='cpu'){ cpuScore++; resetKickoff('CPUのゴール...'); }
+
+  turns--; ep=Math.min(maxEP,ep+2);
+  refresh();
+  if(turns<=0){ endGame(); }
+}
+
+function resetKickoff(msg){ ballPos=0; owner=Math.random()<0.5?'you':'cpu'; log(msg); }
+
+function refresh(){
+  el('myScore').textContent=myScore;
+  el('cpuScore').textContent=cpuScore;
+  el('ep').textContent=ep;
+  el('time').textContent=turns;
+  el('owner').textContent=owner==='you'?'あなた':'CPU';
+  el('zone').textContent=['自陣PA','自陣','センター','敵陣','敵PA'][ballPos+2];
+  el('ball').style.left = `${50+ballPos*20}%`;
+  drawHand();
+}
+
+function endGame(){
+  const result = myScore===cpuScore?'引き分け':(myScore>cpuScore?'勝利！':'敗北');
+  log(`試合終了: ${result}`);
+  el('hand').innerHTML = `<button class="card" onclick="location.reload()">もう一度プレイ</button>`;
+}
+
+log('キックオフ！カードを選んでください。');
+refresh();
+</script>
+</body>
+</html>
