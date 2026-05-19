@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>なんでもバトラー</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <h1>なんでもバトラー ⚔️</h1>
+      <p class="lead">戦わせたいものを2つ入力して、バトル開始！</p>
+
+      <section class="fighters">
+        <div class="card">
+          <label for="fighterA">ファイターA</label>
+          <input id="fighterA" type="text" placeholder="例: カレー" />
+        </div>
+        <div class="card">
+          <label for="fighterB">ファイターB</label>
+          <input id="fighterB" type="text" placeholder="例: ラーメン" />
+        </div>
+      </section>
+
+      <button id="battleBtn">バトル開始</button>
+
+      <section id="result" class="result hidden" aria-live="polite"></section>
+      <section id="log" class="log hidden"></section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
