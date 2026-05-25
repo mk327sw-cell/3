@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>茶屋 - 和と未来が出会う一杯</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero" id="top">
+      <div class="wrap">
+        <p class="eyebrow">TEA · CYBER · GOURMET</p>
+        <h1>茶屋</h1>
+        <p>和の香りに、未来のひらめきを。</p>
+        <a href="#cta">今すぐ味わう</a>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section aria-labelledby="concept-title">
+        <h2 id="concept-title">コンセプト 3本柱</h2>
+        <div role="tablist" aria-label="コンセプト切替">
+          <button class="concept-tab" data-concept-tab="a" aria-selected="true">a. 茶葉風</button>
+          <button class="concept-tab" data-concept-tab="b" aria-selected="false">b. サイバー</button>
+          <button class="concept-tab" data-concept-tab="c" aria-selected="false">c. ミシュラン</button>
+        </div>
+
+        <article class="card concept-panel" id="concept-a" data-concept-panel="a">
+          <h3>a. 茶葉風</h3>
+          <p>産地・摘採時期・焙煎度を丁寧に見極め、茶葉本来の香りと余韻を最大化。風土の個性をそのまま湯呑へ。</p>
+        </article>
+        <article class="card concept-panel" id="concept-b" data-concept-panel="b" hidden>
+          <h3>b. サイバー</h3>
+          <p>温度・抽出秒数・濃度設計をデータ化し、毎回ブレのない理想の一杯を実現。伝統にテクノロジーの精度を重ねます。</p>
+        </article>
+        <article class="card concept-panel" id="concept-c" data-concept-panel="c" hidden>
+          <h3>c. ミシュラン</h3>
+          <p>料理とのペアリングを前提に、甘味・旨味・渋味のバランスを設計。コースのように楽しめるお茶体験を提案します。</p>
+        </article>
+      </section>
+
+      <section aria-labelledby="products-title">
+        <h2 id="products-title">おすすめ商品</h2>
+        <div class="grid">
+          <article class="card product-card" data-product-card>
+            <h3>宵霧シングルオリジン煎茶</h3>
+            <p>静岡産・一番茶。澄んだ旨味と海苔香が特徴の、凛とした一杯。</p>
+            <p>価格: 1,800円</p>
+          </article>
+          <article class="card product-card" data-product-card>
+            <h3>ネオ焙じブレンド 2049</h3>
+            <p>低温焙煎と深煎りを重ねた、カカオのような香ばしさを楽しむ現代焙じ茶。</p>
+            <p>価格: 2,200円</p>
+          </article>
+          <article class="card product-card" data-product-card>
+            <h3>月白抹茶ラボ・エディション</h3>
+            <p>石臼挽き抹茶に微発泡の口当たりを設計。デザートにも合う新感覚抹茶。</p>
+            <p>価格: 2,600円</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="cta" class="cta" aria-labelledby="cta-title">
+        <h2 id="cta-title">まずは初回限定セットから</h2>
+        <p>人気3種を飲み比べできるスターターセットをご用意。あなたの「推しの一杯」を見つけてください。</p>
+        <a href="#top">初回セットを購入する</a>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>&copy; 2026 茶屋. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
